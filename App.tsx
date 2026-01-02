@@ -16,7 +16,19 @@ const App: React.FC = () => {
     return saved ? JSON.parse(saved) : [];
   });
 
-  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(() => {
+    // Attempt to restore last session
+    const lastSessionId = localStorage.getItem('nihongo_last_session_id');
+    const savedSessions = localStorage.getItem('nihongo_sessions');
+    
+    if (lastSessionId && savedSessions) {
+        const parsedSessions: Session[] = JSON.parse(savedSessions);
+        if (parsedSessions.some(s => s.id === lastSessionId)) {
+            return lastSessionId;
+        }
+    }
+    return null;
+  });
 
   // Migration Effect: If no sessions but legacy data exists, create a default session
   useEffect(() => {
@@ -44,6 +56,15 @@ const App: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('nihongo_sessions', JSON.stringify(sessions));
   }, [sessions]);
+
+  // Persist current session ID
+  useEffect(() => {
+      if (currentSessionId) {
+          localStorage.setItem('nihongo_last_session_id', currentSessionId);
+      } else {
+          localStorage.removeItem('nihongo_last_session_id');
+      }
+  }, [currentSessionId]);
 
 
   // Session Actions

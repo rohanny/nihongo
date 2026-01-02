@@ -187,14 +187,16 @@ const SessionManager: React.FC<SessionManagerProps> = ({ sessions, onCreateSessi
             ))}
           </AnimatePresence>
 
-            <motion.button
-              layout
-              onClick={() => setViewMode('create')}
-              className="w-full py-6 border-2 border-dashed border-zinc-800 rounded-2xl flex items-center justify-center gap-2 text-zinc-400 hover:text-zinc-300 hover:border-zinc-700 transition-colors"
-            >
-              <Plus size={20} />
-              <span>New Profile</span>
-            </motion.button>
+            {sessions.length < 4 && (
+                <motion.button
+                layout
+                onClick={() => setViewMode('create')}
+                className="w-full py-6 border-2 border-dashed border-zinc-800 rounded-2xl flex items-center justify-center gap-2 text-zinc-400 hover:text-zinc-300 hover:border-zinc-700 transition-colors"
+                >
+                <Plus size={20} />
+                <span>New Profile</span>
+                </motion.button>
+            )}
         </div>
       </div>
     </div>

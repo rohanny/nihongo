@@ -220,9 +220,9 @@ const Study: React.FC<StudyProps> = ({ progress, updateProgress, addToRevision }
   const currentKana = sessionQueue[currentIndex];
 
   return (
-    <div className="h-full flex flex-col items-center justify-center bg-white dark:bg-zinc-950 relative p-6 transition-colors">
+    <div className="h-full flex flex-col items-center justify-center bg-white dark:bg-zinc-950 relative p-6 pt-16 transition-colors">
         {/* Top bar info */}
-        <div className="absolute top-8 w-full max-w-md flex justify-between items-center text-xs tracking-widest font-mono text-zinc-300 dark:text-zinc-600 px-4">
+        <div className="absolute top-16 w-full max-w-md flex justify-between items-center text-xs tracking-widest font-mono text-zinc-300 dark:text-zinc-600 px-4">
             <span>SESSION: {currentIndex + 1} / {isUnlocked ? <span className="text-lg leading-none align-middle">∞</span> : sessionQueue.length}</span>
             <span>NEW</span>
         </div>
