@@ -4,6 +4,7 @@ import { UserProgress, Kana } from '../types';
 import Flashcard from '../components/Flashcard';
 import { ALL_CHARACTERS } from '../constants';
 import { RotateCcw, Check } from 'lucide-react';
+import { CheckIcon } from '../components/ui/check';
 
 interface DashboardProps {
   progress: UserProgress;
@@ -68,6 +69,8 @@ const Dashboard: React.FC<DashboardProps> = ({ progress, updateProgress, addToRe
                 {chars.map((kana) => {
                   const id = `${kana.type}-${kana.romaji}`;
                   const isLearned = learnedSet.has(id);
+                  const isInRevision = progress.revisionList.includes(id);
+                  
                   return (
                     <motion.div
 
@@ -75,9 +78,11 @@ const Dashboard: React.FC<DashboardProps> = ({ progress, updateProgress, addToRe
                       key={`${kana.type}-${kana.romaji}`}
                       className={`
                         aspect-square flex items-center justify-center text-xl md:text-2xl rounded-xl transition-colors duration-500 japanese-text relative group cursor-pointer
-                        ${isLearned 
-                          ? 'bg-black text-white shadow-lg dark:bg-zinc-100 dark:text-zinc-900' 
-                          : 'bg-zinc-50 text-zinc-200 dark:bg-zinc-900 dark:text-zinc-800'
+                        ${isInRevision
+                            ? 'bg-zinc-200 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300'
+                            : isLearned 
+                                ? 'bg-black text-white shadow-lg dark:bg-zinc-100 dark:text-zinc-900' 
+                                : 'bg-zinc-50 text-zinc-200 dark:bg-zinc-900 dark:text-zinc-800'
                         }
                       `}
                       title={`${kana.romaji}`}
@@ -135,7 +140,7 @@ const Dashboard: React.FC<DashboardProps> = ({ progress, updateProgress, addToRe
                             }}
                             className={`flex items-center justify-center gap-3 py-4 rounded-full border transition-all duration-300 font-medium tracking-wide text-sm group
                                 ${progress.revisionList.includes(`${selectedKana.type}-${selectedKana.romaji}`)
-                                    ? 'border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900'
+                                    ? 'border-zinc-200 bg-zinc-200 text-zinc-900 dark:border-zinc-800 dark:bg-zinc-800 dark:text-zinc-200'
                                     : 'border-zinc-200 dark:border-zinc-700 bg-white/50 dark:bg-black/50 backdrop-blur-md text-zinc-500 dark:text-zinc-400 hover:border-zinc-900 dark:hover:border-zinc-200 hover:text-zinc-900 dark:hover:text-zinc-200'
                                 }
                             `}
@@ -162,7 +167,7 @@ const Dashboard: React.FC<DashboardProps> = ({ progress, updateProgress, addToRe
                                 }
                             `}
                         >
-                            <Check size={16} />
+                            <CheckIcon size={16} />
                             {learnedSet.has(`${selectedKana.type}-${selectedKana.romaji}`) ? 'Learned' : 'Mark Seen'}
                         </button>
                     </motion.div>

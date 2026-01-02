@@ -1,6 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { UserProgress, Session } from '../types';
-import { User, Upload, Moon, Sun, Monitor, Pencil, Check, X, LogOut } from 'lucide-react';
+import { User, Upload, Monitor, Pencil, Check, X } from 'lucide-react';
+import { SunIcon } from '../components/ui/sun';
+import { MoonIcon } from '../components/ui/moon';
+import { LogoutIcon } from '../components/ui/logout';
+import { BotIcon } from '../components/ui/bot';
 
 interface SettingsProps {
   progress: UserProgress;
@@ -78,7 +82,7 @@ const Settings: React.FC<SettingsProps> = ({
                          {session.avatar ? (
                              <img src={session.avatar} alt="Profile" className="w-full h-full object-cover" />
                          ) : (
-                             <User size={24} className="text-zinc-400" />
+                             <BotIcon size={32} className="text-zinc-400 group-hover:text-zinc-600 dark:text-zinc-500 dark:group-hover:text-zinc-300 transition-colors" />
                          )}
                      </div>
                      <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -135,7 +139,7 @@ const Settings: React.FC<SettingsProps> = ({
                             className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors"
                             title="Switch Profile"
                         >
-                            <LogOut size={18} />
+                            <LogoutIcon size={18} />
                         </button>
                      </div>
                  )}
@@ -152,8 +156,8 @@ const Settings: React.FC<SettingsProps> = ({
                     className="bg-zinc-200 dark:bg-zinc-800 p-1 rounded-full flex items-center gap-1 relative w-16 h-8 transition-colors"
                 >
                      <div className={`absolute w-6 h-6 rounded-full bg-white dark:bg-zinc-600 shadow-sm transition-all duration-300 ${theme === 'dark' ? 'left-9' : 'left-1'}`} />
-                     <div className="flex-1 flex justify-center text-zinc-500 dark:text-zinc-600 z-10 text-[10px]"><Sun size={12}/></div>
-                     <div className="flex-1 flex justify-center text-zinc-400 dark:text-zinc-400 z-10 text-[10px]"><Moon size={12}/></div>
+                     <div className="flex-1 flex justify-center text-zinc-500 dark:text-zinc-600 z-10 text-[10px]"><SunIcon size={12}/></div>
+                     <div className="flex-1 flex justify-center text-zinc-400 dark:text-zinc-400 z-10 text-[10px]"><MoonIcon size={12}/></div>
                 </button>
             </div>
             

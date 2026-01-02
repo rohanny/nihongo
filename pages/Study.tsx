@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { ALL_CHARACTERS } from '../constants';
 import Flashcard from '../components/Flashcard';
 import { UserProgress, Kana } from '../types';
-import { RotateCcw, Check, Lock, Trophy } from 'lucide-react';
+import { RotateCcw, Check, Trophy } from 'lucide-react';
+import { LockKeyholeIcon } from '../components/ui/lock-keyhole';
+import { LockKeyholeOpenIcon } from '../components/ui/lock-keyhole-open';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface StudyProps {
@@ -18,13 +20,33 @@ const Study: React.FC<StudyProps> = ({ progress, updateProgress, addToRevision }
   const [sessionComplete, setSessionComplete] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
+  // Lock Mechanism State
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [holdProgress, setHoldProgress] = useState(0);
+  const holdInterval = useRef<NodeJS.Timeout | null>(null);
+  const lockIconRef = useRef<any>(null); // For animating the lock
+
+  // Clean up interval on unmount
+  useEffect(() => {
+    return () => {
+        if (holdInterval.current) clearInterval(holdInterval.current);
+    };
+  }, []);
+
   // Initialize Queue
   useEffect(() => {
     if (isInitialized) return; // Only run once per mount
 
     const today = new Date().toISOString().split('T')[0];
     const dailyCount = progress.dailyProgress.date === today ? progress.dailyProgress.count : 0;
-    const remainingQuota = Math.max(0, progress.settings.dailyGoal - dailyCount);
+    
+    // Determine quota: Normal daily goal OR Bonus (10 cards) if unlocked
+    let remainingQuota = Math.max(0, progress.settings.dailyGoal - dailyCount);
+    
+    if (isUnlocked) {
+        // Bonus round: Infinite cards (all remaining unlearned)
+        remainingQuota = ALL_CHARACTERS.length;
+    }
 
     if (remainingQuota === 0) {
         setSessionComplete(true);
@@ -38,15 +60,21 @@ const Study: React.FC<StudyProps> = ({ progress, updateProgress, addToRevision }
 
     // Take only what's needed for today
     const queue = unlearned.slice(0, remainingQuota);
-    setSessionQueue(queue);
+    
     
     // If we have quota but no unlearned cards left (completed all Kana)
-    if (queue.length === 0 && unlearned.length === 0) {
+    if (unlearned.length === 0) {
         setSessionComplete(true); 
+         // Force empty queue
+        setSessionQueue([]);
+    } else {
+        setSessionQueue(queue);
+         // If queue is empty even if unlearned exists (shouldn't happen with logic above unless remainingQuota is 0)
+        if (queue.length === 0) setSessionComplete(true);
     }
-
+    
     setIsInitialized(true);
-  }, [progress, isInitialized]);
+  }, [progress, isInitialized, isUnlocked]); // Re-run when unlocked state changes and we cycle isInitialized
 
   const handleNext = () => {
     if (currentIndex >= sessionQueue.length - 1) {
@@ -77,6 +105,51 @@ const Study: React.FC<StudyProps> = ({ progress, updateProgress, addToRevision }
     handleNext();
   };
 
+    // Lock Interaction Handlers
+    const startHold = () => {
+        if (holdInterval.current || isUnlocked) return;
+        
+        const startTime = Date.now();
+        holdInterval.current = setInterval(() => {
+            const elapsed = Date.now() - startTime;
+            // 2 seconds = 2000ms
+            if (elapsed >= 2000) {
+                // Trigger unlock sequence
+                if (holdInterval.current) clearInterval(holdInterval.current);
+                playUnlockSequence();
+            }
+        }, 100);
+    };
+
+    const stopHold = () => {
+        if (holdInterval.current) {
+            clearInterval(holdInterval.current);
+            holdInterval.current = null;
+        }
+    };
+    
+    const playUnlockSequence = () => {
+        // 1. Switch to Open Icon (Unlock state for UI)
+        setIsUnlocked(true);
+        
+        // 2. Play animation
+        setTimeout(() => {
+             if (lockIconRef.current) lockIconRef.current.startAnimation();
+        }, 50);
+
+        // 3. Wait for animation then load cards
+        setTimeout(() => {
+            completeUnlock();
+        }, 800);
+    };
+    
+    const completeUnlock = () => {
+        // Trigger re-initialization of queue
+        setIsInitialized(false);
+        setSessionComplete(false);
+        setCurrentIndex(0);
+    };
+
   if (!isInitialized) {
       return null; // Or a loading spinner
   }
@@ -86,22 +159,57 @@ const Study: React.FC<StudyProps> = ({ progress, updateProgress, addToRevision }
       const today = new Date().toISOString().split('T')[0];
       const dailyCount = progress.dailyProgress.date === today ? progress.dailyProgress.count : 0;
       const isQuotaFull = dailyCount >= progress.settings.dailyGoal;
+      
+      // If we are unlocked (in middle of animation sequence) or just finished bonus
+      // If isUnlocked is true here, it means we are waiting for the timeout to re-init
+      // OR we finished the bonus round. 
+      // If we finished bonus round: isQuotaFull is true, isUnlocked is true.
+      // We want to reset isUnlocked to false to show the lock again? 
+      // The user wants "if user switches pages go to default state". 
+      // But if they finish bonus, should it lock again? Yes, probably.
+      
+      const showLock = isQuotaFull;
 
       return (
           <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-white dark:bg-zinc-950 transition-colors">
-              <div className="w-16 h-16 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center mb-6">
-                  {isQuotaFull ? (
-                      <Lock className="text-zinc-400 dark:text-zinc-500" size={24} />
+              <div className="relative mb-6">
+                {showLock ? (
+                     <div 
+                        className="relative cursor-pointer touch-none select-none"
+                        onMouseDown={startHold}
+                        onMouseUp={stopHold}
+                        onMouseLeave={() => {
+                            stopHold();
+                            lockIconRef.current?.stopAnimation();
+                        }}
+                        onTouchStart={startHold}
+                        onTouchEnd={stopHold}
+                        onMouseEnter={() => lockIconRef.current?.startAnimation()}
+                     >
+                        <div className="w-16 h-16 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center relative z-10 transition-transform active:scale-95">
+                             {isUnlocked ? (
+                                 <LockKeyholeIcon ref={lockIconRef} className="text-zinc-900 dark:text-zinc-50" size={28} />
+                             ) : (
+                                 <LockKeyholeOpenIcon ref={lockIconRef} className="text-zinc-400 dark:text-zinc-500" size={28} />
+                             )}
+                        </div>
+                     </div>
                   ) : (
-                      <Trophy className="text-zinc-400 dark:text-zinc-500" size={24} />
+                      <div className="w-16 h-16 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center">
+                        <Trophy className="text-zinc-400 dark:text-zinc-500" size={24} />
+                      </div>
                   )}
               </div>
+              
               <h2 className="text-2xl font-light text-zinc-900 dark:text-white mb-2">
-                  {isQuotaFull ? "Daily Goal Reached" : "All Caught Up!"}
+                  {showLock 
+                    ? "Daily Goal Reached"
+                    : "All Caught Up!"
+                  }
               </h2>
               <p className="text-zinc-500 dark:text-zinc-400 mb-8 max-w-xs mx-auto">
                   You've studied {dailyCount} cards today. 
-                  {isQuotaFull 
+                  {showLock 
                     ? " Great consistency! Come back tomorrow." 
                     : " You've learned all available characters!"}
               </p>
@@ -115,7 +223,7 @@ const Study: React.FC<StudyProps> = ({ progress, updateProgress, addToRevision }
     <div className="h-full flex flex-col items-center justify-center bg-white dark:bg-zinc-950 relative p-6 transition-colors">
         {/* Top bar info */}
         <div className="absolute top-8 w-full max-w-md flex justify-between items-center text-xs tracking-widest font-mono text-zinc-300 dark:text-zinc-600 px-4">
-            <span>SESSION: {currentIndex + 1} / {sessionQueue.length}</span>
+            <span>SESSION: {currentIndex + 1} / {isUnlocked ? <span className="text-lg leading-none align-middle">∞</span> : sessionQueue.length}</span>
             <span>NEW</span>
         </div>
 

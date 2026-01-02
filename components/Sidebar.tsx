@@ -1,7 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ViewState } from '../types';
-import { Grid, Layers, Zap, RotateCcw, Settings as SettingsIcon } from 'lucide-react';
+import { GripIcon } from './ui/grip';
+import { LayersIcon } from './ui/layers';
+import { ZapIcon } from './ui/zap';
+import { RefreshCWIcon } from './ui/refresh-cw';
+import { SettingsIcon } from './ui/settings';
 
 interface SidebarProps {
   currentView: ViewState;
@@ -13,10 +17,10 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, isOpen, setIsOpen, theme }) => {
   const navItems = [
-    { id: ViewState.DASHBOARD, label: 'Grid', icon: Grid },
-    { id: ViewState.STUDY, label: 'Study', icon: Layers },
-    { id: ViewState.REVISE, label: 'Revise', icon: RotateCcw },
-    { id: ViewState.QUIZ, label: 'Test', icon: Zap },
+    { id: ViewState.DASHBOARD, label: 'Grid', icon: GripIcon },
+    { id: ViewState.STUDY, label: 'Study', icon: LayersIcon },
+    { id: ViewState.REVISE, label: 'Revise', icon: RefreshCWIcon },
+    { id: ViewState.QUIZ, label: 'Test', icon: ZapIcon },
     { id: ViewState.SETTINGS, label: 'Setup', icon: SettingsIcon },
   ];
 
@@ -46,7 +50,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, isOpen, setIsOp
                 `}
                 aria-label={item.label}
               >
-                <item.icon size={20} strokeWidth={1.5} />
+                <item.icon size={20} />
                 
                 {/* Tooltip */}
                 <span className="absolute left-14 bg-black text-white dark:bg-white dark:text-black text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
@@ -74,7 +78,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, isOpen, setIsOp
                   }
                 `}
               >
-                <item.icon size={18} strokeWidth={isActive ? 2 : 1.5} />
+                <item.icon size={18} />
               </button>
             );
           })}
