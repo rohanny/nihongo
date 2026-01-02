@@ -66,10 +66,11 @@ const Dashboard: React.FC<DashboardProps> = ({ progress, updateProgress, addToRe
               </h3>
               <div className="grid grid-cols-5 md:grid-cols-8 lg:grid-cols-10 gap-3">
                 {chars.map((kana) => {
-                  const isLearned = learnedSet.has(kana.romaji);
+                  const id = `${kana.type}-${kana.romaji}`;
+                  const isLearned = learnedSet.has(id);
                   return (
-                    <motion.div 
-                      layoutId={kana.romaji}
+                    <motion.div
+
                       onClick={() => setSelectedKana(kana)}
                       key={`${kana.type}-${kana.romaji}`}
                       className={`
@@ -104,15 +105,16 @@ const Dashboard: React.FC<DashboardProps> = ({ progress, updateProgress, addToRe
                       key="backdrop"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
+                      exit={{ opacity: 0, transition: { duration: 0.2 } }}
                       onClick={() => setSelectedKana(null)}
                       className="absolute inset-0 bg-white/90 dark:bg-black/90 backdrop-blur-sm"
                   />
                   
                   <div className="relative z-10 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
                     <motion.div
-                        layoutId={selectedKana.romaji}
                         className="w-full"
+                        style={{ borderRadius: 24 }}
+                        exit={{ opacity: 0, transition: { duration: 0.2 } }}
                     >
                          <Flashcard kana={selectedKana} />
                     </motion.div>
@@ -121,34 +123,35 @@ const Dashboard: React.FC<DashboardProps> = ({ progress, updateProgress, addToRe
                     <motion.div 
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        transition={{ delay: 0.1 }}
+                        exit={{ opacity: 0, y: 10, transition: { duration: 0.2 } }}
                         className="w-full mt-6 grid grid-cols-2 gap-4"
                     >
                         <button 
-                            onClick={(e) => {
+                                onClick={(e) => {
                                 e.stopPropagation();
-                                addToRevision(selectedKana.romaji);
+                                const id = `${selectedKana.type}-${selectedKana.romaji}`;
+                                addToRevision(selectedKana);
                                 setSelectedKana(null);
                             }}
                             className={`flex items-center justify-center gap-3 py-4 rounded-full border transition-all duration-300 font-medium tracking-wide text-sm group
-                                ${progress.revisionList.includes(selectedKana.romaji)
+                                ${progress.revisionList.includes(`${selectedKana.type}-${selectedKana.romaji}`)
                                     ? 'border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900'
                                     : 'border-zinc-200 dark:border-zinc-700 bg-white/50 dark:bg-black/50 backdrop-blur-md text-zinc-500 dark:text-zinc-400 hover:border-zinc-900 dark:hover:border-zinc-200 hover:text-zinc-900 dark:hover:text-zinc-200'
                                 }
                             `}
                         >
-                            <RotateCcw size={16} className={progress.revisionList.includes(selectedKana.romaji) ? "" : "group-hover:-rotate-180 transition-transform duration-500"}/>
-                            {progress.revisionList.includes(selectedKana.romaji) ? 'In Revision' : 'Revise'}
+                            <RotateCcw size={16} className={progress.revisionList.includes(`${selectedKana.type}-${selectedKana.romaji}`) ? "" : "group-hover:-rotate-180 transition-transform duration-500"}/>
+                            {progress.revisionList.includes(`${selectedKana.type}-${selectedKana.romaji}`) ? 'In Revision' : 'Revise'}
                         </button>
                         
                         <button 
                             onClick={(e) => {
                                 e.stopPropagation();
-                                if (learnedSet.has(selectedKana.romaji)) {
-                                    unlearnKana(selectedKana.romaji);
+                                const id = `${selectedKana.type}-${selectedKana.romaji}`;
+                                if (learnedSet.has(id)) {
+                                    unlearnKana(selectedKana);
                                 } else {
-                                    updateProgress(selectedKana.romaji);
+                                    updateProgress(selectedKana);
                                 }
                                 setSelectedKana(null);
                             }}
@@ -160,7 +163,7 @@ const Dashboard: React.FC<DashboardProps> = ({ progress, updateProgress, addToRe
                             `}
                         >
                             <Check size={16} />
-                            {learnedSet.has(selectedKana.romaji) ? 'Learned' : 'Mark Seen'}
+                            {learnedSet.has(`${selectedKana.type}-${selectedKana.romaji}`) ? 'Learned' : 'Mark Seen'}
                         </button>
                     </motion.div>
                   </div>

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { ViewState, UserProgress } from './types';
 import { INITIAL_PROGRESS } from './constants';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
@@ -7,27 +6,130 @@ import Study from './pages/Study';
 import Revise from './pages/Revise';
 import Quiz from './pages/Quiz';
 import Settings from './pages/Settings';
+import { ViewState, UserProgress, Session } from './types';
+import SessionManager from './pages/SessionManager';
+
 const App: React.FC = () => {
+  // Session State
+  const [sessions, setSessions] = useState<Session[]>(() => {
+    const saved = localStorage.getItem('nihongo_sessions');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+
+  // Migration Effect: If no sessions but legacy data exists, create a default session
+  useEffect(() => {
+    if (sessions.length === 0) {
+        const legacyData = localStorage.getItem('nihongo_progress_zen');
+        if (legacyData) {
+            // Migrating legacy user
+            const defaultSession: Session = {
+                id: crypto.randomUUID(),
+                name: 'Default User',
+                lastActive: Date.now()
+            };
+            setSessions([defaultSession]);
+            // Save the session list immediately so next render doesn't loop
+            localStorage.setItem('nihongo_sessions', JSON.stringify([defaultSession]));
+            
+            // Move legacy data to new key
+            localStorage.setItem(`nihongo_progress_${defaultSession.id}`, legacyData);
+            // Optional: Remove legacy key? localStorage.removeItem('nihongo_progress_zen');
+        }
+    }
+  }, []);
+
+  // Persist sessions
+  useEffect(() => {
+    localStorage.setItem('nihongo_sessions', JSON.stringify(sessions));
+  }, [sessions]);
+
+
+  // Session Actions
+  const handleCreateSession = (name: string) => {
+    const newSession: Session = {
+        id: crypto.randomUUID(),
+        name,
+        lastActive: Date.now()
+    };
+    setSessions(prev => [...prev, newSession]);
+  };
+
+  const handleDeleteSession = (id: string) => {
+    setSessions(prev => prev.filter(s => s.id !== id));
+    localStorage.removeItem(`nihongo_progress_${id}`);
+    if (currentSessionId === id) {
+        setCurrentSessionId(null);
+    }
+  };
+
+  const handleRenameSession = (id: string, newName: string) => {
+      setSessions(prev => prev.map(s => s.id === id ? { ...s, name: newName } : s));
+  };
+
+  const handleSelectSession = (id: string) => {
+    setCurrentSessionId(id);
+    // Update last active
+    setSessions(prev => prev.map(s => s.id === id ? { ...s, lastActive: Date.now() } : s));
+  };
+  const handleUpdateSession = (updatedSession: Session) => {
+    setSessions(prev => prev.map(s => s.id === updatedSession.id ? updatedSession : s));
+  };
+
+
+  // If no session selected, show manager
+  if (!currentSessionId) {
+      return (
+          <SessionManager 
+            sessions={sessions}
+            onCreateSession={handleCreateSession}
+            onSelectSession={handleSelectSession}
+            onDeleteSession={handleDeleteSession}
+            onRenameSession={handleRenameSession}
+          />
+      );
+  }
+
+  const currentSession = sessions.find(s => s.id === currentSessionId)!;
+
+  // Render Authenticated App
+  return (
+    <AuthenticatedApp 
+        key={currentSessionId} 
+        session={currentSession} 
+        onUpdateSession={handleUpdateSession} 
+        clearSession={() => setCurrentSessionId(null)} 
+    />
+  );
+};
+
+// Sub-component to isolate state per session
+const AuthenticatedApp: React.FC<{ 
+    session: Session, 
+    onUpdateSession: (s: Session) => void,
+    clearSession: () => void 
+}> = ({ session, onUpdateSession, clearSession }) => {
   const [currentView, setCurrentView] = useState<ViewState>(ViewState.DASHBOARD);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
-  // Initialize state with fallback for new fields if local storage is old
+  // Initialize state from session-specific storage
   const [progress, setProgress] = useState<UserProgress>(() => {
-    const saved = localStorage.getItem('nihongo_progress_zen');
+    const saved = localStorage.getItem(`nihongo_progress_${session.id}`);
     if (saved) {
         const parsed = JSON.parse(saved);
-        // Merge with initial to ensure new fields like revisionList exist
         return { ...INITIAL_PROGRESS, ...parsed };
     }
     return INITIAL_PROGRESS;
   });
 
   useEffect(() => {
-    localStorage.setItem('nihongo_progress_zen', JSON.stringify(progress));
-  }, [progress]);
+    localStorage.setItem(`nihongo_progress_${session.id}`, JSON.stringify(progress));
+  }, [progress, session.id]);
 
-  const updateProgress = (learnedRomaji: string) => {
+  const updateProgress = (learnedKana: { type: string, romaji: string }) => {
     const today = new Date().toISOString().split('T')[0];
+    const learnId = `${learnedKana.type}-${learnedKana.romaji}`;
     
     setProgress(prev => {
         // Calculate new daily count
@@ -41,9 +143,9 @@ const App: React.FC = () => {
 
         return {
             ...prev,
-            learned: prev.learned.includes(learnedRomaji) ? prev.learned : [...prev.learned, learnedRomaji],
+            learned: prev.learned.includes(learnId) ? prev.learned : [...prev.learned, learnId],
             // Also ensure it's removed from revision if we learn it in study mode
-            revisionList: prev.revisionList.filter(r => r !== learnedRomaji),
+            revisionList: prev.revisionList.filter(r => r !== learnId),
             dailyProgress: {
                 date: today,
                 count: newCount
@@ -52,24 +154,27 @@ const App: React.FC = () => {
     });
   };
 
-  const addToRevision = (romaji: string) => {
+  const addToRevision = (kana: { type: string, romaji: string }) => {
+      const id = `${kana.type}-${kana.romaji}`;
       setProgress(prev => ({
           ...prev,
-          revisionList: prev.revisionList.includes(romaji) ? prev.revisionList : [...prev.revisionList, romaji]
+          revisionList: prev.revisionList.includes(id) ? prev.revisionList : [...prev.revisionList, id]
       }));
   };
 
-  const removeFromRevision = (romaji: string) => {
+  const removeFromRevision = (kana: { type: string, romaji: string }) => {
+      const id = `${kana.type}-${kana.romaji}`;
       setProgress(prev => ({
           ...prev,
-          revisionList: prev.revisionList.filter(r => r !== romaji)
+          revisionList: prev.revisionList.filter(r => r !== id)
       }));
   };
 
-  const unlearnKana = (romaji: string) => {
+  const unlearnKana = (kana: { type: string, romaji: string }) => {
+    const id = `${kana.type}-${kana.romaji}`;
     setProgress(prev => ({
         ...prev,
-        learned: prev.learned.filter(l => l !== romaji)
+        learned: prev.learned.filter(l => l !== id)
     }));
   };
 
@@ -109,7 +214,17 @@ const App: React.FC = () => {
       case ViewState.QUIZ:
         return <Quiz progress={progress} addToRevision={addToRevision} />;
       case ViewState.SETTINGS:
-        return <Settings progress={progress} setDailyGoal={setDailyGoal} />;
+        return (
+            <Settings 
+                progress={progress} 
+                setDailyGoal={setDailyGoal} 
+                onSwitchSession={clearSession}
+                theme={theme}
+                toggleTheme={toggleTheme}
+                session={session}
+                onUpdateSession={onUpdateSession}
+            />
+        );
       default:
         return <Dashboard progress={progress} updateProgress={updateProgress} addToRevision={addToRevision} unlearnKana={unlearnKana} />;
     }
@@ -124,20 +239,13 @@ const App: React.FC = () => {
             isOpen={sidebarOpen}
             setIsOpen={setSidebarOpen}
             theme={theme}
-            toggleTheme={toggleTheme}
         />
 
         <main className="flex-1 flex flex-col h-full overflow-hidden relative">
-            {/* Mobile Top Header (Logo Only) */}
-            <div className="md:hidden pt-6 pb-2 px-6 bg-white dark:bg-zinc-950 flex items-center justify-between transition-colors z-10 shrink-0">
-                 <div className="w-8 h-8 bg-black dark:bg-white rounded-full flex items-center justify-center text-white dark:text-black font-serif font-bold text-sm">
-                    日
-                 </div>
-                 {/* Optional: Add a title or progress summary here later if needed */}
-            </div>
+
 
             {/* Content Viewport */}
-            <div className="flex-1 overflow-auto bg-white dark:bg-zinc-950 transition-colors duration-300 pb-24 md:pb-0">
+            <div className="flex-1 overflow-auto bg-white dark:bg-zinc-950 transition-colors duration-300 pb-24 md:pb-0 pt-safe">
                 {renderContent()}
             </div>
         </main>

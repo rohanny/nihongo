@@ -34,7 +34,7 @@ const Study: React.FC<StudyProps> = ({ progress, updateProgress, addToRevision }
 
     // Filter unlearned cards
     const learnedSet = new Set(progress.learned);
-    const unlearned = ALL_CHARACTERS.filter(c => !learnedSet.has(c.romaji));
+    const unlearned = ALL_CHARACTERS.filter(c => !learnedSet.has(`${c.type}-${c.romaji}`));
 
     // Take only what's needed for today
     const queue = unlearned.slice(0, remainingQuota);
@@ -61,7 +61,7 @@ const Study: React.FC<StudyProps> = ({ progress, updateProgress, addToRevision }
     const currentKana = sessionQueue[currentIndex];
     
     // Mark as learned
-    updateProgress(currentKana.romaji);
+    updateProgress(currentKana);
     
     handleNext();
   };
@@ -71,7 +71,7 @@ const Study: React.FC<StudyProps> = ({ progress, updateProgress, addToRevision }
     const currentKana = sessionQueue[currentIndex];
     
     // Add to revision list
-    addToRevision(currentKana.romaji);
+    addToRevision(currentKana);
     
     // Even if added to revision, we count it as "processed" for this session step
     handleNext();

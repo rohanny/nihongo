@@ -5,6 +5,13 @@ export interface Kana {
   group: string; // e.g., 'a', 'ka', 'sa', 'numbers'
 }
 
+export interface Session {
+  id: string;
+  name: string;
+  lastActive: number;
+  avatar?: string;
+}
+
 export interface UserProgress {
   learned: string[]; // List of romaji identifiers representing characters marked as 'known'
   revisionList: string[]; // List of romaji identifiers that need review

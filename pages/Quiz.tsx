@@ -7,8 +7,8 @@ const generateLocalQuizQuestion = (learned: string[]): QuizQuestion | null => {
     if (learned.length < 4) return null;
 
     // 1. Pick a random correct answer from learned items
-    const correctRomaji = learned[Math.floor(Math.random() * learned.length)];
-    const correctFilter = ALL_CHARACTERS.find(c => c.romaji === correctRomaji);
+    const correctId = learned[Math.floor(Math.random() * learned.length)];
+    const correctFilter = ALL_CHARACTERS.find(c => `${c.type}-${c.romaji}` === correctId);
 
     if (!correctFilter) return null;
 
@@ -16,18 +16,18 @@ const generateLocalQuizQuestion = (learned: string[]): QuizQuestion | null => {
     const distractors: string[] = [];
     while (distractors.length < 3) {
         const randomChar = ALL_CHARACTERS[Math.floor(Math.random() * ALL_CHARACTERS.length)];
-        if (randomChar.romaji !== correctRomaji && !distractors.includes(randomChar.romaji)) {
+        if (randomChar.romaji !== correctFilter.romaji && !distractors.includes(randomChar.romaji)) {
             distractors.push(randomChar.romaji);
         }
     }
 
     // 3. Shuffle options
-    const options = [correctRomaji, ...distractors].sort(() => Math.random() - 0.5);
+    const options = [correctFilter.romaji, ...distractors].sort(() => Math.random() - 0.5);
 
     return {
         question: correctFilter.char, // Show Kana
         targetChar: correctFilter.char,
-        correctAnswer: correctRomaji, // User guesses Romaji (or vice versa, assuming standard quiz)
+        correctAnswer: correctFilter.romaji, // User guesses Romaji (or vice versa, assuming standard quiz)
         options: options
     };
 };
@@ -69,7 +69,9 @@ const Quiz: React.FC<QuizProps> = ({ progress, addToRevision }) => {
 
     if (!correct) {
         // Failed quiz -> Add to Revision
-        addToRevision(questionData.correctAnswer);
+        // We need to find the full Kana object for the correct answer to add it to revision
+        const kana = ALL_CHARACTERS.find(c => c.romaji === questionData.correctAnswer && questionData.targetChar === c.char); // Double check to be safe
+        if (kana) addToRevision(kana);
     }
 
     // Auto-advance if correct after a short delay for flow

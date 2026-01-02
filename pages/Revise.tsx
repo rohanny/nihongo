@@ -13,7 +13,7 @@ const Revise: React.FC<ReviseProps> = ({ progress, removeFromRevision }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // Filter the master list to get full Kana objects for items in revision list
-  const reviseList = ALL_CHARACTERS.filter(k => progress.revisionList.includes(k.romaji));
+  const reviseList = ALL_CHARACTERS.filter(k => progress.revisionList.includes(`${k.type}-${k.romaji}`));
 
   if (reviseList.length === 0) {
       return (
@@ -30,7 +30,7 @@ const Revise: React.FC<ReviseProps> = ({ progress, removeFromRevision }) => {
   const handleMastered = (e: React.MouseEvent) => {
     e.stopPropagation();
     const currentChar = reviseList[currentIndex];
-    removeFromRevision(currentChar.romaji);
+    removeFromRevision(currentChar);
     
     // Adjust index if we removed the last item
     if (currentIndex >= reviseList.length - 1) {

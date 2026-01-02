@@ -432,277 +432,277 @@
     "katakana": [
         {
             "char": "ア",
-            "romaji": "a (katakana)",
+            "romaji": "a",
             "type": "katakana",
             "group": "basic"
         },
         {
             "char": "イ",
-            "romaji": "i (katakana)",
+            "romaji": "i",
             "type": "katakana",
             "group": "basic"
         },
         {
             "char": "ウ",
-            "romaji": "u (katakana)",
+            "romaji": "u",
             "type": "katakana",
             "group": "basic"
         },
         {
             "char": "エ",
-            "romaji": "e (katakana)",
+            "romaji": "e",
             "type": "katakana",
             "group": "basic"
         },
         {
             "char": "オ",
-            "romaji": "o (katakana)",
+            "romaji": "o",
             "type": "katakana",
             "group": "basic"
         },
         {
             "char": "カ",
-            "romaji": "ka (katakana)",
+            "romaji": "ka",
             "type": "katakana",
             "group": "k"
         },
         {
             "char": "キ",
-            "romaji": "ki (katakana)",
+            "romaji": "ki",
             "type": "katakana",
             "group": "k"
         },
         {
             "char": "ク",
-            "romaji": "ku (katakana)",
+            "romaji": "ku",
             "type": "katakana",
             "group": "k"
         },
         {
             "char": "ケ",
-            "romaji": "ke (katakana)",
+            "romaji": "ke",
             "type": "katakana",
             "group": "k"
         },
         {
             "char": "コ",
-            "romaji": "ko (katakana)",
+            "romaji": "ko",
             "type": "katakana",
             "group": "k"
         },
         {
             "char": "サ",
-            "romaji": "sa (katakana)",
+            "romaji": "sa",
             "type": "katakana",
             "group": "s"
         },
         {
             "char": "シ",
-            "romaji": "shi (katakana)",
+            "romaji": "shi",
             "type": "katakana",
             "group": "s"
         },
         {
             "char": "ス",
-            "romaji": "su (katakana)",
+            "romaji": "su",
             "type": "katakana",
             "group": "s"
         },
         {
             "char": "セ",
-            "romaji": "se (katakana)",
+            "romaji": "se",
             "type": "katakana",
             "group": "s"
         },
         {
             "char": "ソ",
-            "romaji": "so (katakana)",
+            "romaji": "so",
             "type": "katakana",
             "group": "s"
         },
         {
             "char": "タ",
-            "romaji": "ta (katakana)",
+            "romaji": "ta",
             "type": "katakana",
             "group": "t"
         },
         {
             "char": "チ",
-            "romaji": "chi (katakana)",
+            "romaji": "chi",
             "type": "katakana",
             "group": "t"
         },
         {
             "char": "ツ",
-            "romaji": "tsu (katakana)",
+            "romaji": "tsu",
             "type": "katakana",
             "group": "t"
         },
         {
             "char": "テ",
-            "romaji": "te (katakana)",
+            "romaji": "te",
             "type": "katakana",
             "group": "t"
         },
         {
             "char": "ト",
-            "romaji": "to (katakana)",
+            "romaji": "to",
             "type": "katakana",
             "group": "t"
         },
         {
             "char": "ナ",
-            "romaji": "na (katakana)",
+            "romaji": "na",
             "type": "katakana",
             "group": "n"
         },
         {
             "char": "ニ",
-            "romaji": "ni (katakana)",
+            "romaji": "ni",
             "type": "katakana",
             "group": "n"
         },
         {
             "char": "ヌ",
-            "romaji": "nu (katakana)",
+            "romaji": "nu",
             "type": "katakana",
             "group": "n"
         },
         {
             "char": "ネ",
-            "romaji": "ne (katakana)",
+            "romaji": "ne",
             "type": "katakana",
             "group": "n"
         },
         {
             "char": "ノ",
-            "romaji": "no (katakana)",
+            "romaji": "no",
             "type": "katakana",
             "group": "n"
         },
         {
             "char": "ハ",
-            "romaji": "ha (katakana)",
+            "romaji": "ha",
             "type": "katakana",
             "group": "h"
         },
         {
             "char": "ヒ",
-            "romaji": "hi (katakana)",
+            "romaji": "hi",
             "type": "katakana",
             "group": "h"
         },
         {
             "char": "フ",
-            "romaji": "fu (katakana)",
+            "romaji": "fu",
             "type": "katakana",
             "group": "h"
         },
         {
             "char": "ヘ",
-            "romaji": "he (katakana)",
+            "romaji": "he",
             "type": "katakana",
             "group": "h"
         },
         {
             "char": "ホ",
-            "romaji": "ho (katakana)",
+            "romaji": "ho",
             "type": "katakana",
             "group": "h"
         },
         {
             "char": "マ",
-            "romaji": "ma (katakana)",
+            "romaji": "ma",
             "type": "katakana",
             "group": "m"
         },
         {
             "char": "ミ",
-            "romaji": "mi (katakana)",
+            "romaji": "mi",
             "type": "katakana",
             "group": "m"
         },
         {
             "char": "ム",
-            "romaji": "mu (katakana)",
+            "romaji": "mu",
             "type": "katakana",
             "group": "m"
         },
         {
             "char": "メ",
-            "romaji": "me (katakana)",
+            "romaji": "me",
             "type": "katakana",
             "group": "m"
         },
         {
             "char": "モ",
-            "romaji": "mo (katakana)",
+            "romaji": "mo",
             "type": "katakana",
             "group": "m"
         },
         {
             "char": "ヤ",
-            "romaji": "ya (katakana)",
+            "romaji": "ya",
             "type": "katakana",
             "group": "y"
         },
         {
             "char": "ユ",
-            "romaji": "yu (katakana)",
+            "romaji": "yu",
             "type": "katakana",
             "group": "y"
         },
         {
             "char": "ヨ",
-            "romaji": "yo (katakana)",
+            "romaji": "yo",
             "type": "katakana",
             "group": "y"
         },
         {
             "char": "ラ",
-            "romaji": "ra (katakana)",
+            "romaji": "ra",
             "type": "katakana",
             "group": "r"
         },
         {
             "char": "リ",
-            "romaji": "ri (katakana)",
+            "romaji": "ri",
             "type": "katakana",
             "group": "r"
         },
         {
             "char": "ル",
-            "romaji": "ru (katakana)",
+            "romaji": "ru",
             "type": "katakana",
             "group": "r"
         },
         {
             "char": "レ",
-            "romaji": "re (katakana)",
+            "romaji": "re",
             "type": "katakana",
             "group": "r"
         },
         {
             "char": "ロ",
-            "romaji": "ro (katakana)",
+            "romaji": "ro",
             "type": "katakana",
             "group": "r"
         },
         {
             "char": "ワ",
-            "romaji": "wa (katakana)",
+            "romaji": "wa",
             "type": "katakana",
             "group": "w"
         },
         {
             "char": "ヲ",
-            "romaji": "wo (katakana)",
+            "romaji": "wo",
             "type": "katakana",
             "group": "w"
         },
         {
             "char": "ン",
-            "romaji": "n (katakana)",
+            "romaji": "n",
             "type": "katakana",
             "group": "n"
         }
@@ -710,151 +710,151 @@
     "katakana_dakuten": [
         {
             "char": "ガ",
-            "romaji": "ga (katakana)",
+            "romaji": "ga",
             "type": "katakana",
             "group": "dakuten"
         },
         {
             "char": "ギ",
-            "romaji": "gi (katakana)",
+            "romaji": "gi",
             "type": "katakana",
             "group": "dakuten"
         },
         {
             "char": "グ",
-            "romaji": "gu (katakana)",
+            "romaji": "gu",
             "type": "katakana",
             "group": "dakuten"
         },
         {
             "char": "ゲ",
-            "romaji": "ge (katakana)",
+            "romaji": "ge",
             "type": "katakana",
             "group": "dakuten"
         },
         {
             "char": "ゴ",
-            "romaji": "go (katakana)",
+            "romaji": "go",
             "type": "katakana",
             "group": "dakuten"
         },
         {
             "char": "ザ",
-            "romaji": "za (katakana)",
+            "romaji": "za",
             "type": "katakana",
             "group": "dakuten"
         },
         {
             "char": "ジ",
-            "romaji": "ji (katakana)",
+            "romaji": "ji",
             "type": "katakana",
             "group": "dakuten"
         },
         {
             "char": "ズ",
-            "romaji": "zu (katakana)",
+            "romaji": "zu",
             "type": "katakana",
             "group": "dakuten"
         },
         {
             "char": "ゼ",
-            "romaji": "ze (katakana)",
+            "romaji": "ze",
             "type": "katakana",
             "group": "dakuten"
         },
         {
             "char": "ゾ",
-            "romaji": "zo (katakana)",
+            "romaji": "zo",
             "type": "katakana",
             "group": "dakuten"
         },
         {
             "char": "ダ",
-            "romaji": "da (katakana)",
+            "romaji": "da",
             "type": "katakana",
             "group": "dakuten"
         },
         {
             "char": "ヂ",
-            "romaji": "ji (katakana)",
+            "romaji": "ji",
             "type": "katakana",
             "group": "dakuten"
         },
         {
             "char": "ヅ",
-            "romaji": "zu (katakana)",
+            "romaji": "zu",
             "type": "katakana",
             "group": "dakuten"
         },
         {
             "char": "デ",
-            "romaji": "de (katakana)",
+            "romaji": "de",
             "type": "katakana",
             "group": "dakuten"
         },
         {
             "char": "ド",
-            "romaji": "do (katakana)",
+            "romaji": "do",
             "type": "katakana",
             "group": "dakuten"
         },
         {
             "char": "バ",
-            "romaji": "ba (katakana)",
+            "romaji": "ba",
             "type": "katakana",
             "group": "dakuten"
         },
         {
             "char": "ビ",
-            "romaji": "bi (katakana)",
+            "romaji": "bi",
             "type": "katakana",
             "group": "dakuten"
         },
         {
             "char": "ブ",
-            "romaji": "bu (katakana)",
+            "romaji": "bu",
             "type": "katakana",
             "group": "dakuten"
         },
         {
             "char": "ベ",
-            "romaji": "be (katakana)",
+            "romaji": "be",
             "type": "katakana",
             "group": "dakuten"
         },
         {
             "char": "ボ",
-            "romaji": "bo (katakana)",
+            "romaji": "bo",
             "type": "katakana",
             "group": "dakuten"
         },
         {
             "char": "パ",
-            "romaji": "pa (katakana)",
+            "romaji": "pa",
             "type": "katakana",
             "group": "handakuten"
         },
         {
             "char": "ピ",
-            "romaji": "pi (katakana)",
+            "romaji": "pi",
             "type": "katakana",
             "group": "handakuten"
         },
         {
             "char": "プ",
-            "romaji": "pu (katakana)",
+            "romaji": "pu",
             "type": "katakana",
             "group": "handakuten"
         },
         {
             "char": "ペ",
-            "romaji": "pe (katakana)",
+            "romaji": "pe",
             "type": "katakana",
             "group": "handakuten"
         },
         {
             "char": "ポ",
-            "romaji": "po (katakana)",
+            "romaji": "po",
             "type": "katakana",
             "group": "handakuten"
         }

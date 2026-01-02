@@ -1,17 +1,161 @@
-import React from 'react';
-import { UserProgress } from '../types';
+import React, { useRef, useState, useEffect } from 'react';
+import { UserProgress, Session } from '../types';
+import { User, Upload, Moon, Sun, Monitor, Pencil, Check, X, LogOut } from 'lucide-react';
 
 interface SettingsProps {
   progress: UserProgress;
+  session: Session;
   setDailyGoal: (goal: number) => void;
+  onSwitchSession: () => void;
+  theme: 'light' | 'dark';
+  toggleTheme: () => void;
+  onUpdateSession: (session: Session) => void;
 }
 
-const Settings: React.FC<SettingsProps> = ({ progress, setDailyGoal }) => {
+const Settings: React.FC<SettingsProps> = ({ 
+    progress, 
+    session,
+    setDailyGoal, 
+    onSwitchSession,
+    theme,
+    toggleTheme,
+    onUpdateSession
+}) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Renaming state
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editName, setEditName] = useState(session.name);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+      if (isEditingName && nameInputRef.current) {
+          nameInputRef.current.focus();
+      }
+  }, [isEditingName]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+          if (file.size > 1024 * 1024) { // 1MB limit
+              alert("Image size must be less than 1MB");
+              return;
+          }
+
+          const reader = new FileReader();
+          reader.onloadend = () => {
+              const base64 = reader.result as string;
+              onUpdateSession({ ...session, avatar: base64 });
+          };
+          reader.readAsDataURL(file);
+      }
+  };
+
+  const handleSaveName = (e?: React.FormEvent) => {
+      if (e) e.preventDefault();
+      if (editName.trim()) {
+          onUpdateSession({ ...session, name: editName.trim() });
+          setIsEditingName(false);
+      }
+  };
+
+  const handleCancelEdit = () => {
+      setEditName(session.name);
+      setIsEditingName(false);
+  };
+
   return (
-    <div className="h-full flex flex-col items-center justify-center p-8">
+    <div className="h-full flex flex-col items-center justify-center p-8 overflow-y-auto">
         <h2 className="text-2xl font-light text-zinc-900 dark:text-zinc-50 mb-12">Preferences</h2>
 
         <div className="w-full max-w-md space-y-6">
+            
+            {/* Profile Card (Horizontal) */}
+            <div className="bg-zinc-50 dark:bg-zinc-900 rounded-2xl p-4 border border-zinc-100 dark:border-zinc-800 flex items-center gap-4 shadow-sm">
+                 {/* Avatar */}
+                 <div className="relative group cursor-pointer flex-shrink-0" onClick={() => fileInputRef.current?.click()}>
+                     <div className="w-16 h-16 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center overflow-hidden ring-2 ring-white dark:ring-zinc-950 shadow-md transition-transform hover:scale-105">
+                         {session.avatar ? (
+                             <img src={session.avatar} alt="Profile" className="w-full h-full object-cover" />
+                         ) : (
+                             <User size={24} className="text-zinc-400" />
+                         )}
+                     </div>
+                     <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                         <Upload size={16} className="text-white" />
+                     </div>
+                 </div>
+                 <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    className="hidden" 
+                    accept="image/*"
+                    onChange={handleFileChange}
+                 />
+
+                 {/* Name & Edit Logic */}
+                 <div className="flex-1 min-w-0">
+                     {isEditingName ? (
+                         <form onSubmit={handleSaveName} className="flex items-center gap-2">
+                             <input 
+                                ref={nameInputRef}
+                                type="text" 
+                                value={editName}
+                                onChange={(e) => setEditName(e.target.value)}
+                                className="bg-transparent border-b border-zinc-300 dark:border-zinc-700 w-full outline-none font-medium text-lg py-1 text-zinc-900 dark:text-zinc-50"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Escape') handleCancelEdit();
+                                }}
+                                autoFocus
+                             />
+                             <button type="submit" className="text-green-500 hover:text-green-600"><Check size={18}/></button>
+                             <button type="button" onClick={handleCancelEdit} className="text-red-400 hover:text-red-500"><X size={18}/></button>
+                         </form>
+                     ) : (
+                         <div 
+                            className="flex flex-col justify-center cursor-pointer group/name"
+                            onClick={() => {
+                                setEditName(session.name);
+                                setIsEditingName(true);
+                            }}
+                         >
+                            <h3 className="font-medium text-lg text-zinc-900 dark:text-zinc-50 truncate group-hover/name:text-black dark:group-hover/name:text-white transition-colors flex items-center gap-2">
+                                {session.name}
+                                <Pencil size={14} className="opacity-0 group-hover/name:opacity-50 transition-opacity text-zinc-400" />
+                            </h3>
+                         </div>
+                     )}
+                 </div>
+
+                 {/* Actions */}
+                 {!isEditingName && (
+                     <div className="flex items-center gap-2">
+                        <button 
+                            onClick={onSwitchSession}
+                            className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors"
+                            title="Switch Profile"
+                        >
+                            <LogOut size={18} />
+                        </button>
+                     </div>
+                 )}
+            </div>
+
+            {/* Theme */}
+            <div className="bg-zinc-50 dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                <div>
+                     <span className="block text-zinc-900 dark:text-zinc-50 font-medium text-sm">Appearance</span>
+                     <span className="text-zinc-400 text-xs">Toggle light or dark mode</span>
+                </div>
+                <button 
+                    onClick={toggleTheme}
+                    className="bg-zinc-200 dark:bg-zinc-800 p-1 rounded-full flex items-center gap-1 relative w-16 h-8 transition-colors"
+                >
+                     <div className={`absolute w-6 h-6 rounded-full bg-white dark:bg-zinc-600 shadow-sm transition-all duration-300 ${theme === 'dark' ? 'left-9' : 'left-1'}`} />
+                     <div className="flex-1 flex justify-center text-zinc-500 dark:text-zinc-600 z-10 text-[10px]"><Sun size={12}/></div>
+                     <div className="flex-1 flex justify-center text-zinc-400 dark:text-zinc-400 z-10 text-[10px]"><Moon size={12}/></div>
+                </button>
+            </div>
             
             {/* Daily Goal */}
             <div className="bg-zinc-50 dark:bg-zinc-900 rounded-2xl p-8 border border-zinc-100 dark:border-zinc-800 transition-colors">
@@ -36,6 +180,8 @@ const Settings: React.FC<SettingsProps> = ({ progress, setDailyGoal }) => {
                     Controls the number of *new* cards you can mark as "Seen" per day. Reviewing old cards is always unlimited.
                 </p>
             </div>
+
+
         </div>
     </div>
   );
