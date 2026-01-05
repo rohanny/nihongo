@@ -2,35 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { QuizQuestion, UserProgress } from '../types';
 import { RotateCcw } from 'lucide-react';
 import { ALL_CHARACTERS } from '../constants';
-
-const generateLocalQuizQuestion = (learned: string[]): QuizQuestion | null => {
-    if (learned.length < 4) return null;
-
-    // 1. Pick a random correct answer from learned items
-    const correctId = learned[Math.floor(Math.random() * learned.length)];
-    const correctFilter = ALL_CHARACTERS.find(c => `${c.type}-${c.romaji}` === correctId);
-
-    if (!correctFilter) return null;
-
-    // 2. Pick 3 distractors from ALL_CHARACTERS (excluding the correct one)
-    const distractors: string[] = [];
-    while (distractors.length < 3) {
-        const randomChar = ALL_CHARACTERS[Math.floor(Math.random() * ALL_CHARACTERS.length)];
-        if (randomChar.romaji !== correctFilter.romaji && !distractors.includes(randomChar.romaji)) {
-            distractors.push(randomChar.romaji);
-        }
-    }
-
-    // 3. Shuffle options
-    const options = [correctFilter.romaji, ...distractors].sort(() => Math.random() - 0.5);
-
-    return {
-        question: correctFilter.char, // Show Kana
-        targetChar: correctFilter.char,
-        correctAnswer: correctFilter.romaji, // User guesses Romaji (or vice versa, assuming standard quiz)
-        options: options
-    };
-};
+import { generateExtremeRandomQuizQuestion } from '../lib/quizGenerator';
 
 interface QuizProps {
     progress: UserProgress;
@@ -47,7 +19,7 @@ const Quiz: React.FC<QuizProps> = ({ progress, addToRevision }) => {
     setSelectedOption(null);
     setIsCorrect(null);
     
-    const data = generateLocalQuizQuestion(progress.learned);
+    const data = generateExtremeRandomQuizQuestion(progress.learned);
     if (!data) {
         setNotEnoughData(true);
     } else {
