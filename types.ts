@@ -12,6 +12,21 @@ export interface Session {
   avatar?: string;
 }
 
+export interface QuizSession {
+  startTime: number;
+  endTime: number;
+  correct: number;
+  total: number;
+}
+
+export interface DailyStats {
+  date: string;       // ISO YYYY-MM-DD
+  studyCount: number; // Cards learned/seen
+  quizCorrect: number;
+  quizTotal: number;
+  sessions?: QuizSession[];
+}
+
 export interface UserProgress {
   learned: string[]; // List of romaji identifiers representing characters marked as 'known'
   revisionList: string[]; // List of romaji identifiers that need review
@@ -19,6 +34,7 @@ export interface UserProgress {
     date: string; // ISO date string
     count: number;
   };
+  history: DailyStats[];
   settings: {
     dailyGoal: number;
   };

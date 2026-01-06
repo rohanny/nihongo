@@ -8,9 +8,9 @@ import { CheckIcon } from '../components/ui/check';
 
 interface DashboardProps {
   progress: UserProgress;
-  updateProgress: (newLearned: string) => void;
-  addToRevision: (romaji: string) => void;
-  unlearnKana: (romaji: string) => void;
+  updateProgress: (kana: { type: string; romaji: string }) => void;
+  addToRevision: (kana: { type: string; romaji: string }) => void;
+  unlearnKana: (kana: { type: string; romaji: string }) => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ progress, updateProgress, addToRevision, unlearnKana }) => {

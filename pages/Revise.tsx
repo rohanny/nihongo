@@ -6,7 +6,7 @@ import { Check, Layers } from 'lucide-react';
 
 interface ReviseProps {
   progress: UserProgress;
-  removeFromRevision: (romaji: string) => void;
+  removeFromRevision: (kana: { type: string; romaji: string }) => void;
 }
 
 const Revise: React.FC<ReviseProps> = ({ progress, removeFromRevision }) => {

@@ -134,11 +134,26 @@ const AuthenticatedApp: React.FC<{
   const [currentView, setCurrentView] = useState<ViewState>(ViewState.DASHBOARD);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
+  // Gemini quiz mode state
+  const [geminiMode, setGeminiMode] = useState<boolean>(() => {
+    const saved = localStorage.getItem('nihongo_gemini_mode');
+    return saved === 'true';
+  });
+
+  // Persist gemini mode preference
+  useEffect(() => {
+    localStorage.setItem('nihongo_gemini_mode', geminiMode.toString());
+  }, [geminiMode]);
+  
   // Initialize state from session-specific storage
   const [progress, setProgress] = useState<UserProgress>(() => {
     const saved = localStorage.getItem(`nihongo_progress_${session.id}`);
     if (saved) {
         const parsed = JSON.parse(saved);
+        // Migration: Ensure history exists
+        if (!parsed.history) {
+            parsed.history = [];
+        }
         return { ...INITIAL_PROGRESS, ...parsed };
     }
     return INITIAL_PROGRESS;
@@ -162,6 +177,25 @@ const AuthenticatedApp: React.FC<{
             newCount = 1;
         }
 
+        // Update History
+        let history = [...(prev.history || [])];
+        const todayStatsIndex = history.findIndex(h => h.date === today);
+        
+        if (todayStatsIndex >= 0) {
+            history[todayStatsIndex] = {
+                ...history[todayStatsIndex],
+                studyCount: history[todayStatsIndex].studyCount + 1
+            };
+        } else {
+            history.push({
+                date: today,
+                studyCount: 1,
+                quizCorrect: 0,
+                quizTotal: 0
+            });
+        }
+        // Keep history manageable (last 365 days?) - optional optimization for later
+
         return {
             ...prev,
             learned: prev.learned.includes(learnId) ? prev.learned : [...prev.learned, learnId],
@@ -170,9 +204,71 @@ const AuthenticatedApp: React.FC<{
             dailyProgress: {
                 date: today,
                 count: newCount
-            }
+            },
+            history
         };
     });
+  };
+
+  const logQuizResult = (isCorrect: boolean) => {
+      const today = new Date().toISOString().split('T')[0];
+      const now = Date.now();
+      
+      setProgress(prev => {
+          let history = [...(prev.history || [])];
+          const todayStatsIndex = history.findIndex(h => h.date === today);
+
+          if (todayStatsIndex >= 0) {
+              const currentStats = history[todayStatsIndex];
+              let sessions = [...(currentStats.sessions || [])];
+              
+              // Check if we have an active session (last one)
+              // Logic: If last session ended < 5 mins ago, append to it. Else create new.
+              const lastSession = sessions.length > 0 ? sessions[sessions.length - 1] : null;
+              const SESSION_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+
+              if (lastSession && (now - lastSession.endTime < SESSION_TIMEOUT)) {
+                  // Update existing session
+                  sessions[sessions.length - 1] = {
+                      ...lastSession,
+                      endTime: now,
+                      total: lastSession.total + 1,
+                      correct: lastSession.correct + (isCorrect ? 1 : 0)
+                  };
+              } else {
+                  // Create new session
+                  sessions.push({
+                      startTime: now,
+                      endTime: now,
+                      total: 1,
+                      correct: isCorrect ? 1 : 0
+                  });
+              }
+
+              history[todayStatsIndex] = {
+                  ...currentStats,
+                  quizTotal: currentStats.quizTotal + 1,
+                  quizCorrect: currentStats.quizCorrect + (isCorrect ? 1 : 0),
+                  sessions: sessions
+              };
+          } else {
+              // New day, new history, new session
+              history.push({
+                  date: today,
+                  studyCount: 0,
+                  quizTotal: 1,
+                  quizCorrect: isCorrect ? 1 : 0,
+                  sessions: [{
+                      startTime: now,
+                      endTime: now,
+                      total: 1,
+                      correct: isCorrect ? 1 : 0
+                  }]
+              });
+          }
+
+          return { ...prev, history };
+      });
   };
 
   const addToRevision = (kana: { type: string, romaji: string }) => {
@@ -233,7 +329,7 @@ const AuthenticatedApp: React.FC<{
       case ViewState.REVISE:
         return <Revise progress={progress} removeFromRevision={removeFromRevision} />;
       case ViewState.QUIZ:
-        return <Quiz progress={progress} addToRevision={addToRevision} />;
+        return <Quiz progress={progress} addToRevision={addToRevision} geminiMode={geminiMode} logQuizResult={logQuizResult} />;
       case ViewState.SETTINGS:
         return (
             <Settings 
@@ -260,6 +356,8 @@ const AuthenticatedApp: React.FC<{
             isOpen={sidebarOpen}
             setIsOpen={setSidebarOpen}
             theme={theme}
+            geminiMode={geminiMode}
+            setGeminiMode={setGeminiMode}
         />
 
         <main className="flex-1 flex flex-col h-full overflow-hidden relative">

@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { UserProgress, Session } from '../types';
-import { User, Upload, Monitor, Pencil, Check, X } from 'lucide-react';
+import Report from '../components/Report';
+import { User, Upload, Monitor, Pencil, Check, X, BarChart2 } from 'lucide-react';
 import { SunIcon } from '../components/ui/sun';
 import { MoonIcon } from '../components/ui/moon';
 import { LogoutIcon } from '../components/ui/logout';
@@ -32,6 +33,9 @@ const Settings: React.FC<SettingsProps> = ({
   const [editName, setEditName] = useState(session.name);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
+  // Report View State
+  const [showReport, setShowReport] = useState(false);
+
   useEffect(() => {
       if (isEditingName && nameInputRef.current) {
           nameInputRef.current.focus();
@@ -39,6 +43,7 @@ const Settings: React.FC<SettingsProps> = ({
   }, [isEditingName]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      // ... same
       const file = e.target.files?.[0];
       if (file) {
           if (file.size > 1024 * 1024) { // 1MB limit
@@ -68,6 +73,13 @@ const Settings: React.FC<SettingsProps> = ({
       setIsEditingName(false);
   };
 
+  // Render Report sub-view
+  if (showReport) {
+      return (
+          <Report progress={progress} onBack={() => setShowReport(false)} />
+      );
+  }
+
   return (
     <div className="h-full flex flex-col items-center justify-center p-8 overflow-y-auto">
         <h2 className="text-2xl font-light text-zinc-900 dark:text-zinc-50 mb-12">Preferences</h2>
@@ -76,7 +88,7 @@ const Settings: React.FC<SettingsProps> = ({
             
             {/* Profile Card (Horizontal) */}
             <div className="bg-zinc-50 dark:bg-zinc-900 rounded-2xl p-4 border border-zinc-100 dark:border-zinc-800 flex items-center gap-4 shadow-sm">
-                 {/* Avatar */}
+                 {/* ... Avatar code ... */}
                  <div className="relative group cursor-pointer flex-shrink-0" onClick={() => fileInputRef.current?.click()}>
                      <div className="w-16 h-16 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center overflow-hidden ring-2 ring-white dark:ring-zinc-950 shadow-md transition-transform hover:scale-105">
                          {session.avatar ? (
@@ -144,6 +156,26 @@ const Settings: React.FC<SettingsProps> = ({
                      </div>
                  )}
             </div>
+
+            {/* Status Report Link */}
+            <button 
+                onClick={() => setShowReport(true)}
+                className="w-full bg-zinc-50 dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-100 dark:border-zinc-800 flex items-center justify-between group hover:border-zinc-300 dark:hover:border-zinc-600 transition-all hover:shadow-sm"
+            >
+                <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-500 dark:text-zinc-400 group-hover:text-black dark:group-hover:text-white transition-colors">
+                        <BarChart2 size={18} />
+                    </div>
+                    <div className="text-left">
+                        <span className="block text-zinc-900 dark:text-zinc-50 font-medium">Status Report</span>
+                        <span className="text-zinc-400 text-xs">View your study history & analytics</span>
+                    </div>
+                </div>
+                <div className="text-zinc-300 dark:text-zinc-600 group-hover:translate-x-1 transition-transform">
+                    →
+                </div>
+            </button>
+
 
             {/* Theme */}
             <div className="bg-zinc-50 dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-100 dark:border-zinc-800 flex items-center justify-between">

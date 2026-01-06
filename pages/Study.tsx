@@ -9,8 +9,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface StudyProps {
   progress: UserProgress;
-  updateProgress: (newLearned: string) => void;
-  addToRevision: (romaji: string) => void;
+  updateProgress: (kana: { type: string; romaji: string }) => void;
+  addToRevision: (kana: { type: string; romaji: string }) => void;
 }
 
 const Study: React.FC<StudyProps> = ({ progress, updateProgress, addToRevision }) => {

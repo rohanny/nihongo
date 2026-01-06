@@ -16,6 +16,7 @@ export const INITIAL_PROGRESS: UserProgress = {
     date: new Date().toISOString().split('T')[0],
     count: 0
   },
+  history: [],
   settings: {
     dailyGoal: 5
   }
